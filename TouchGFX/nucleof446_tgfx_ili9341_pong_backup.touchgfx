@@ -1,0 +1,195 @@
+{
+  "Application": {
+    "Screens": [
+      {
+        "Name": "screen",
+        "Components": [
+          {
+            "Type": "Image",
+            "Name": "backgtound",
+            "Width": 320,
+            "Height": 240,
+            "RelativeFilename": "southpole_320x240.png"
+          },
+          {
+            "Type": "TextureMapper",
+            "Name": "pingu",
+            "X": 56,
+            "Y": 27,
+            "Width": 42,
+            "Height": 42,
+            "RenderingAlgorithm": "Nearest-neighbor",
+            "FileNameImage": "lemmling_Cartoon_penguin_sm.png",
+            "LockBitmapToCenter": true,
+            "XBitmapPosition": 1.0,
+            "YBitmapPosition": 1.0,
+            "Scale": 1.0,
+            "LockOrigoToCenter": true,
+            "XOrigo": 21.0,
+            "YOrigo": 21.0,
+            "ZOrigo": 1000.0,
+            "CameraDistance": 1000.0
+          },
+          {
+            "Type": "TextureMapper",
+            "Name": "lPaddle",
+            "X": 8,
+            "Y": 105,
+            "Width": 15,
+            "Height": 62,
+            "RenderingAlgorithm": "Nearest-neighbor",
+            "FileNameImage": "paddleBO.png",
+            "LockBitmapToCenter": true,
+            "XBitmapPosition": -22.5,
+            "YBitmapPosition": 23.0,
+            "ZAngle": 1.571,
+            "Scale": 1.0,
+            "LockOrigoToCenter": true,
+            "XOrigo": 7.5,
+            "YOrigo": 31.0,
+            "ZOrigo": 1000.0,
+            "CameraDistance": 1000.0
+          },
+          {
+            "Type": "TextureMapper",
+            "Name": "rPaddle",
+            "X": 296,
+            "Y": 105,
+            "Width": 15,
+            "Height": 62,
+            "RenderingAlgorithm": "Nearest-neighbor",
+            "FileNameImage": "paddleBO.png",
+            "LockBitmapToCenter": true,
+            "XBitmapPosition": -22.5,
+            "YBitmapPosition": 23.0,
+            "ZAngle": 1.571,
+            "Scale": 1.0,
+            "LockOrigoToCenter": true,
+            "XOrigo": 7.5,
+            "YOrigo": 31.0,
+            "ZOrigo": 1000.0,
+            "CameraDistance": 1000.0
+          },
+          {
+            "Type": "TextArea",
+            "Name": "lScore",
+            "X": 71,
+            "Width": 13,
+            "Height": 24,
+            "TextId": "__SingleUse_C8Z5",
+            "TextRotation": "0",
+            "AutoSize": true,
+            "Wildcard1": {
+              "TextId": "__SingleUse_YSE4",
+              "UseBuffer": true,
+              "BufferSize": 5
+            }
+          },
+          {
+            "Type": "TextArea",
+            "Name": "rScore",
+            "X": 238,
+            "Width": 13,
+            "Height": 24,
+            "TextId": "__SingleUse_D28V",
+            "TextRotation": "0",
+            "AutoSize": true,
+            "Wildcard1": {
+              "TextId": "rScoreID",
+              "UseBuffer": true,
+              "BufferSize": 5
+            }
+          },
+          {
+            "Type": "TextArea",
+            "Name": "lWin",
+            "X": 23,
+            "Y": 184,
+            "Width": 101,
+            "Height": 24,
+            "Visible": false,
+            "TextId": "__SingleUse_56ZB",
+            "TextRotation": "0",
+            "Color": {
+              "Red": 219,
+              "Green": 20,
+              "Blue": 20
+            },
+            "AutoSize": true
+          },
+          {
+            "Type": "TextArea",
+            "Name": "rWin",
+            "X": 174,
+            "Y": 184,
+            "Width": 122,
+            "Height": 24,
+            "Visible": false,
+            "TextId": "__SingleUse_9IW4",
+            "TextRotation": "0",
+            "Color": {
+              "Red": 219,
+              "Green": 20,
+              "Blue": 50
+            },
+            "AutoSize": true
+          }
+        ],
+        "Interactions": []
+      }
+    ],
+    "CustomContainerDefinitions": [],
+    "Name": "MyApplication",
+    "Resolution": {
+      "Width": 320,
+      "Height": 240
+    },
+    "SelectedColorDepth": 16,
+    "StartupScreenName": "screen",
+    "SelectedStartupLanguage": "GB",
+    "TouchGfxPath": "../Middlewares/ST/touchgfx",
+    "UIPath": ".",
+    "AvailableColorDepths": [
+      16
+    ],
+    "AvailableLCDs": {
+      "16": "LCD16bpp"
+    },
+    "AvailableSections": [
+      "ExtFlashSection",
+      "IntFlashSection"
+    ],
+    "AvailableResolutions": [
+      {
+        "Width": 320,
+        "Height": 240
+      }
+    ],
+    "PhysicalButtons": [],
+    "FrameworkFeatures": {
+      "LCD16bpp": {
+        "Id": "LCD16bpp",
+        "IsEnabled": true
+      }
+    },
+    "GenerateAssetsCommand": "make -f simulator/gcc/Makefile assets -j8",
+    "PostGenerateCommand": "touchgfx update_project --project-file=simulator/msvs/Application.vcxproj",
+    "PostGenerateTargetCommand": "touchgfx update_project",
+    "CompileSimulatorCommand": "make -f simulator/gcc/Makefile -j8",
+    "RunSimulatorCommand": "build\\bin\\simulator.exe",
+    "LandscapeSkinX": 0,
+    "LandscapeSkinY": 0,
+    "PortraitSkinX": 0,
+    "PortraitSkinY": 0,
+    "DisplayOrientation": "Landscape",
+    "Family": "STM32F4",
+    "SubFamily": "STM32F446",
+    "Toolchain": "STM32CubeIDE",
+    "Platform": "m4",
+    "ProjectFile": "../nucleof446_tgfx_ili9341_pong.ioc",
+    "OptionalComponentsRoot": "../Middlewares/ST/touchgfx_components",
+    "OptionalComponents": [],
+    "AdditionalFeatures": []
+  },
+  "Version": "4.22.0"
+}
