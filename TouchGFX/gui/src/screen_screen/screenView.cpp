@@ -10,6 +10,23 @@
 
 extern int16_t lcounter;
 extern int16_t rcounter;
+extern TIM_HandleTypeDef htim8;
+
+void playSound(uint16_t freq, uint16_t duration)
+{
+    if (freq == 0 || duration == 0) {
+        HAL_TIM_PWM_Stop(&htim8, TIM_CHANNEL_2);
+        return;
+    }
+    uint32_t period = 1000000 / freq;
+    __HAL_TIM_SET_PRESCALER(&htim8, 180);
+    __HAL_TIM_SET_AUTORELOAD(&htim8, period);
+    __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_2, period / 2);
+    HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_2);
+    HAL_Delay(duration);
+    HAL_TIM_PWM_Stop(&htim8, TIM_CHANNEL_2);
+}
+
 
 //convert bcd value to decimal of same value
 //convert 0x34 to 34 dec.
@@ -79,22 +96,30 @@ void screenView::tearDownScreen() {
 void screenView::handleTickEvent() {
 	tickCounter++;
 
-	Right ? (xpos += xAccel) : (xpos -= xAccel); //move in x direction
 	if (!gameOver) {
+		Right ? (xpos += xAccel) : (xpos -= xAccel); //move in x direction
+
 		//right wall?
 		if (xpos > TFTX) {
 
 			leftScore++;
+			Unicode::snprintf(lScoreBuffer, LSCORE_SIZE, "%d", leftScore);
+			lScore.resizeToCurrentText();
+			lScore.invalidateContent();
+
 			if (leftScore >= 10) {
 				leftScore = 10;
 				lWin.setVisible(true);
 				lWin.invalidateContent();
 				gameOver = true;
+				pingu.setVisible(false);
+				pingu.invalidate();
+				lppos = lPaddleYPos + lcounter * 4;
+				lPaddle.moveTo(lPaddleXPos, lppos);
+				rppos = rPaddleYPos + rcounter * 4;
+				rPaddle.moveTo(rPaddleXPos, rppos);
+				return;
 			}
-
-			Unicode::snprintf(lScoreBuffer, LSCORE_SIZE, "%d", leftScore);
-			lScore.resizeToCurrentText();
-			lScore.invalidateContent();
 
 			xpos = 280;
 			ypos = 20;
@@ -108,108 +133,94 @@ void screenView::handleTickEvent() {
 		if (xpos < 0 - SPRITEW) {
 			if (!gameOver)
 				rightScore++;
+			
+			Unicode::snprintf(rScoreBuffer, RSCORE_SIZE, "%d", rightScore);
+			rScore.resizeToCurrentText();
+			rScore.invalidateContent();
+
 			if (rightScore >= 10) {
 				rightScore = 10;
 				rWin.setVisible(true);
 				rWin.invalidateContent();
 				gameOver = true;
+				pingu.setVisible(false);
+				pingu.invalidate();
+				lppos = lPaddleYPos + lcounter * 4;
+				lPaddle.moveTo(lPaddleXPos, lppos);
+				rppos = rPaddleYPos + rcounter * 4;
+				rPaddle.moveTo(rPaddleXPos, rppos);
+				return;
 			}
-
-			Unicode::snprintf(rScoreBuffer, RSCORE_SIZE, "%d", rightScore);
-			rScore.resizeToCurrentText();
-			rScore.invalidateContent();
 
 			xpos = 20;
 			ypos = 20;
 			Right = true;
 			Down = true;
 		}
-	}
 
-	//check right paddle
-	if (Right) {
-		int xpos_old = xpos - xAccel;
-		if ((xpos_old + SPRITEW <= rPaddleXPos) && (xpos + SPRITEW > rPaddleXPos)) {
-			if ((ypos < rppos + rPaddleHeight) && (ypos + SPRITEH > rppos)) {
-				Right = false;
-				xpos = rPaddleXPos - SPRITEW;
-				xAccel = rand() % 5 + 2;
+		//check right paddle
+		if (Right) {
+			int xpos_old = xpos - xAccel;
+			if ((xpos_old + SPRITEW <= rPaddleXPos) && (xpos + SPRITEW > rPaddleXPos)) {
+				if ((ypos < rppos + rPaddleHeight) && (ypos + SPRITEH > rppos)) {
+					Right = false;
+					xpos = rPaddleXPos - SPRITEW;
+					xAccel = rand() % 5 + 2;
+					playSound(440, 50);
 
-				if (ypos + SPRITEH / 2 < rppos + rPaddleHeight / 3) {
-					Down = false; // Hit top part of the paddle, go up
-					zAngle = 0.1;
-				} else if (ypos + SPRITEH / 2 > rppos + 2 * rPaddleHeight / 3) {
-					Down = true; // Hit bottom part, go down
-					zAngle = -0.1;
+					if (ypos + SPRITEH / 2 < rppos + rPaddleHeight / 3) {
+						Down = false; // Hit top part of the paddle, go up
+						zAngle = 0.1;
+					} else if (ypos + SPRITEH / 2 > rppos + 2 * rPaddleHeight / 3) {
+						Down = true; // Hit bottom part, go down
+						zAngle = -0.1;
+					}
 				}
 			}
 		}
-	}
-	//check left paddle
-	else { // !Right
-		int xpos_old = xpos + xAccel;
-		if ((xpos_old >= lPaddleXPos + lPaddleWidth) && (xpos < lPaddleXPos + lPaddleWidth)) {
-			if ((ypos < lppos + lPaddleHeight) && (ypos + SPRITEH > lppos)) {
-				Right = true;
-				xpos = lPaddleXPos + lPaddleWidth;
-				xAccel = rand() % 5 + 2;
+		//check left paddle
+		else { // !Right
+			int xpos_old = xpos + xAccel;
+			if ((xpos_old >= lPaddleXPos + lPaddleWidth) && (xpos < lPaddleXPos + lPaddleWidth)) {
+				if ((ypos < lppos + lPaddleHeight) && (ypos + SPRITEH > lppos)) {
+					Right = true;
+					xpos = lPaddleXPos + lPaddleWidth;
+					xAccel = rand() % 5 + 2;
+					playSound(440, 50);
 
-				if (ypos + SPRITEH / 2 < lppos + lPaddleHeight / 3) {
-					Down = false;
-					zAngle = -0.1;
-				} else if (ypos + SPRITEH / 2 > lppos + 2 * lPaddleHeight / 3) {
-					Down = true;
-					zAngle = 0.1;
+					if (ypos + SPRITEH / 2 < lppos + lPaddleHeight / 3) {
+						Down = false;
+						zAngle = -0.1;
+					} else if (ypos + SPRITEH / 2 > lppos + 2 * lPaddleHeight / 3) {
+						Down = true;
+						zAngle = 0.1;
+					}
 				}
 			}
 		}
+
+		Down ? ypos++ : ypos--;	//move in y direction
+		if (ypos > TFTY - SPRITEH) {		//check bottom edge
+			Down = false;
+			yAccel = rand() % 6;
+			playSound(220, 50);
+
+		}
+		if (ypos < 0) {			//check top edge
+			Down = true;
+			yAccel = rand() % 6;
+			playSound(220, 50);
+		}
+
+		pingu.updateZAngle(zpos += zAngle);
+		pingu.moveTo(xpos, ypos);
 	}
-
-	Down ? ypos++ : ypos--;	//move in y direction
-	if (ypos > TFTY - SPRITEH) {		//check bottom edge
-		Down = false;
-		yAccel = rand() % 6;
-
-	}
-	if (ypos < 0) {			//check top edge
-		Down = true;
-		yAccel = rand() % 6;
-	}
-
-//    		 		if(Right && Up){
-//    		 			zAngle=-0.1;
-//    		 		}
-//
-//    		 		if(Right && Down){
-//    		 			zAngle=-0.1;
-//    		 		}
-//
-//
-//    		 		if(Left && Up){
-//    		 			zAngle=0.1;
-//    		 		}
-//
-//    		 		if(Left && Down){
-//    		 			zAngle=0.1;
-//    		 		}
-
-//    	pingu.setOrigo(100, 100)
-	pingu.updateZAngle(zpos += zAngle);
-	pingu.moveTo(xpos, ypos);
-
-	//lPaddle.updateZAngle(1.0); //rotate in radians
 
 	lppos = lPaddleYPos + lcounter * 4;
 	lPaddle.moveTo(lPaddleXPos, lppos);
 
-	//rPaddle.updateZAngle(1.5708); //rotate in radians
 	rppos = rPaddleYPos + rcounter * 4;
 	rPaddle.moveTo(rPaddleXPos, rppos);
-
-	//   }
-
-//    pingu.startMoveAnimation(200, 170, 2, EasingEquations::linearEaseNone, EasingEquations::linearEaseNone);
-//    pingu.startMoveAnimation(233, 170, 20, EasingEquations::linearEaseNone, EasingEquations::linearEaseNone);
 
 }
 
